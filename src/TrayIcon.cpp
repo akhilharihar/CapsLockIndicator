@@ -31,7 +31,7 @@ TrayIcon::TrayIcon(HWND hWnd, HINSTANCE hInst) {
 	nid.uFlags = NIF_ICON | NIF_TIP;
 	nid.uID = uicond;
 	this->reloadIcon();
-	StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"CapsLock Enabled");
+	StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Caps Lock Enabled");
 }
 
 TrayIcon::~TrayIcon() {
