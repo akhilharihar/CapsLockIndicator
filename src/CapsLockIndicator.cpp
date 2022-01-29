@@ -30,11 +30,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE,_In_ PWSTR pCmdL
 	RegisterClassEx(&wc);
 
 	// Window
-#if _DEBUG
-	HWND ParentWindow = NULL;
-#else
-	HWND ParentWindow = HWND_MESSAGE;
-#endif
 
 	gHwnd = CreateWindowW(
 		szWindowClass,                     // Window class
@@ -42,7 +37,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE,_In_ PWSTR pCmdL
 		WS_OVERLAPPEDWINDOW,            // Window style
 		// Size and position
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		ParentWindow,       // Parent window    
+		NULL,       // Parent window    
 		NULL,       // Menu
 		hInstance,  // Instance handle
 		NULL        // Additional application data
@@ -61,7 +56,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE,_In_ PWSTR pCmdL
 		return 11;
 	}
 
+#if _DEBUG
 	ShowWindow(gHwnd, nCmdShow);
+#endif
 
 	// Run the message loop.
 	MSG msg = { };
