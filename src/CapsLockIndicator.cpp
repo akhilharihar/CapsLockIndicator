@@ -67,14 +67,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE,_In_ PWSTR pCmdL
 		DispatchMessage(&msg);
 	}
 
-	cleanup();
-
 	return 0;
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
-	case WM_DESTROY: {
+	case WM_CLOSE:
+	case WM_QUIT:
+	case WM_QUERYENDSESSION: {
+		cleanup();
+		DestroyWindow(hwnd);
 		PostQuitMessage(0);
 		return 0;
 	}
