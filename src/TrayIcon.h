@@ -1,17 +1,18 @@
-#ifndef TRAYICON_H_
-#define TRAYICON_H_
+#include <string>
+
 #include <Windows.h>
 
+#ifndef _TRAYICON_H_
+#define _TRAYICON_H_
+
 class TrayIcon {
-	NOTIFYICONDATAW nid;
-	static const UINT uicond{742};
-	HINSTANCE phInst{};
-	void removeIcon();
+	NOTIFYICONDATAW iconData;
+	HINSTANCE instanceHandle{};
 public:
-	void reloadIcon();
-	TrayIcon(HWND, HINSTANCE);
+	TrayIcon(HINSTANCE, HWND, UINT, std::wstring &);
 	~TrayIcon();
-	void ShowIcon(bool = true);
+	void show();
+	void hide();
 };
 
 #endif // !TRAYICON_H_

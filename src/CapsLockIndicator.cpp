@@ -1,83 +1,99 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include "CapsLockIndicator.h"
-#include "../resource.h"
+#include <string>
+#include <memory>
+
+#include <Windows.h>
 #include <CommCtrl.h>
+
+#include "resource.h"
 #include "TrayIcon.h"
+#include "ReturnStatus.h"
 
-HANDLE hMutexHandle;
-const wchar_t szWindowClass[] = L"CapsLockWindowClass";
+HANDLE applicationMutexHandle;
+const std::wstring windowClassName{ L"CapsLockWindowClass" };
 
-HHOOK gHK;
-TrayIcon* CapsLockIcon{ nullptr };
+HHOOK applicationWindowHook;
+std::unique_ptr<TrayIcon> capsLockIcon;
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE,_In_ PWSTR pCmdLine,_In_ int nCmdShow) {
+LRESULT CALLBACK processWindowMessageHandler(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK keyboardInputHandler(int, WPARAM, LPARAM);
+UINT getCapsLockIconResourceValue();
+HANDLE createMutexHandle();
+void cleanupMutexHandle(HANDLE);
+void cleanup();
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
 	// Ensure that there's only one instance of this application.
-	hMutexHandle = CreateMutex(NULL, true, szWindowClass);
-	if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		return 8;
+	applicationMutexHandle = createMutexHandle();
+	if (!applicationMutexHandle) {
+		return ReturnStatus::INSTANCE_EXISTS;
 	}
 
-	HWND gHwnd{ NULL };
+	HWND windowHandle{ nullptr };
+	WNDCLASSEXW windowClass{ sizeof(WNDCLASSEXW) };
 
-	// Register Window class
-	WNDCLASSEX wc{ sizeof(WNDCLASSEX) };
-	wc.lpfnWndProc = WindowProc;
-	wc.hInstance = hInstance;
-	wc.lpszClassName = szWindowClass;
-	LoadIconMetric(hInstance, MAKEINTRESOURCE(IDI_CAPSLOCK_B), LIM_SMALL, &wc.hIcon);
-	LoadIconMetric(hInstance, MAKEINTRESOURCE(IDI_CAPSLOCK_B), LIM_SMALL, &wc.hIconSm);
-	RegisterClassEx(&wc);
+	windowClass.lpfnWndProc = processWindowMessageHandler;
+	windowClass.hInstance = hInstance;
+	windowClass.lpszClassName = windowClassName.c_str();
+	windowClass.hIcon = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_CAPSLOCK_DARK_ICON));
+	windowClass.hIconSm = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_CAPSLOCK_DARK_ICON));
+	RegisterClassExW(&windowClass);
 
 	// Window
 
-	gHwnd = CreateWindowW(
-		szWindowClass,                     // Window class
-		L"CapsLock Indicator",    // Window title
+	windowHandle = CreateWindowW(
+		windowClassName.c_str(),                     // Window class
+		L"Caps Lock Indicator",    // Window title
 		WS_OVERLAPPEDWINDOW,            // Window style
 		// Size and position
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		NULL,       // Parent window    
-		NULL,       // Menu
+		nullptr,       // Parent window    
+		nullptr,       // Menu
 		hInstance,  // Instance handle
-		NULL        // Additional application data
+		nullptr        // Additional application data
 	);
 
-	if (!gHwnd) {
-		return 10;
+	if (!windowHandle) {
+		cleanupMutexHandle(applicationMutexHandle);
+		return ReturnStatus::ERROR_CREATING_WINDOW;
 	}
 
+	std::wstring toolTip{ L"Caps Lock Enabled" };
+
 	// register tray icon
-	CapsLockIcon = new TrayIcon(gHwnd, hInstance);
+	capsLockIcon = std::make_unique<TrayIcon>(hInstance, windowHandle, getCapsLockIconResourceValue(), toolTip);
 
 	// Keyboard hook
-	gHK = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
-	if (!gHK) {
-		return 11;
+	applicationWindowHook = SetWindowsHookExW(WH_KEYBOARD_LL, keyboardInputHandler, nullptr, 0);
+	if (!applicationWindowHook) {
+		DestroyWindow(windowHandle);
+		cleanupMutexHandle(applicationMutexHandle);
+		return ReturnStatus::ERROR_REGISTERING_HOOK;
 	}
 
 #if _DEBUG
-	ShowWindow(gHwnd, nCmdShow);
+	ShowWindow(windowHandle, nCmdShow);
 #endif
 
 	// Run the message loop.
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	MSG windowMessages = { };
+	while (GetMessage(&windowMessages, nullptr, 0, 0) > 0) {
+		TranslateMessage(&windowMessages);
+		DispatchMessage(&windowMessages);
 	}
 
-	return 0;
+	return ReturnStatus::OK;
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK processWindowMessageHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_CLOSE:
 	case WM_QUIT:
 	case WM_QUERYENDSESSION: {
 		cleanup();
 		DestroyWindow(hwnd);
-		PostQuitMessage(0);
+		PostQuitMessage(ReturnStatus::OK);
 		return 0;
 	}
 	}
@@ -85,10 +101,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT keyboardInputHandler(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode < 0 || wParam != WM_KEYUP) {
 
-		return CallNextHookEx(NULL, nCode, wParam, lParam);
+		return CallNextHookEx(nullptr, nCode, wParam, lParam);
 	}
 
 	PKBDLLHOOKSTRUCT inputKey = (PKBDLLHOOKSTRUCT)lParam;
@@ -96,22 +112,39 @@ LRESULT LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (inputKey->vkCode == VK_CAPITAL) {
 
 		if ((GetKeyState(VK_CAPITAL) & 1)) {
-			CapsLockIcon->ShowIcon();
+			capsLockIcon->show();
 		}
 		else {
-			CapsLockIcon->ShowIcon(false);
+			capsLockIcon->hide();
 		}
 	}
 
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+HANDLE createMutexHandle() {
+	return CreateMutexW(nullptr, true, windowClassName.c_str());
+}
+
+void cleanupMutexHandle(HANDLE mutexHandle) {
+	ReleaseMutex(mutexHandle);
+	CloseHandle(mutexHandle);
 }
 
 void cleanup() {
-	ReleaseMutex(hMutexHandle);
-	CloseHandle(hMutexHandle);
-	UnhookWindowsHookEx(gHK);
-	if (CapsLockIcon) {
-		delete(CapsLockIcon);
-		CapsLockIcon = nullptr;
+	cleanupMutexHandle(applicationMutexHandle);
+	UnhookWindowsHookEx(applicationWindowHook);
+	capsLockIcon.reset();
+}
+
+UINT getCapsLockIconResourceValue() {
+	LSTATUS regRequest{};
+	DWORD wzCLSID;
+	DWORD statuslen{ sizeof(wzCLSID) };
+	regRequest = RegGetValue(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", L"SystemUsesLightTheme", RRF_RT_REG_DWORD, nullptr, (void*)&wzCLSID, &statuslen);
+	if (regRequest || !wzCLSID) {
+		return IDI_CAPSLOCK_ICON;
 	}
+
+	return IDI_CAPSLOCK_DARK_ICON;
 }

@@ -45,9 +45,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -90,16 +92,16 @@
     <ClCompile Include="src\TrayIcon.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="src\CapsLockIndicator.h" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\ReturnStatus.h" />
     <ClInclude Include="src\TrayIcon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CapsLockIndicator.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\icons\capslock_b.ico" />
-    <Image Include="resources\icons\capslock_w.ico" />
+    <Image Include="resources\icons\capslock.ico" />
+    <Image Include="resources\icons\capslock_dark.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

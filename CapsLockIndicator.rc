@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
+#include ".\src\resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h\0"
+    ".\\src\\resource.h\0"
 END
 
 2 TEXTINCLUDE 
@@ -52,9 +52,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_CAPSLOCK_B          ICON                    "resources\\icons\\capslock_b.ico"
+IDI_CAPSLOCK_ICON       ICON                    "resources\\icons\\capslock.ico"
 
-IDI_CAPSLOCK_W          ICON                    "resources\\icons\\capslock_w.ico"
+IDI_CAPSLOCK_DARK_ICON  ICON                    "resources\\icons\\capslock_dark.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,8 @@ IDI_CAPSLOCK_W          ICON                    "resources\\icons\\capslock_w.ic
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,0,0
- PRODUCTVERSION 0,9,0,0
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -80,12 +80,12 @@ BEGIN
         BLOCK "400904b0"
         BEGIN
             VALUE "FileDescription", "Show Caps Lock Status in Notification Tray"
-            VALUE "FileVersion", "0.9.0.0"
-            VALUE "InternalName", "CapsLock_Indicator.exe"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "CapsLockIndicator.exe"
             VALUE "LegalCopyright", "Copyright (C) 2022"
-            VALUE "OriginalFilename", "CapsLock_Indicator.exe"
+            VALUE "OriginalFilename", "CapsLockIndicator.exe"
             VALUE "ProductName", "Caps Lock Indicator"
-            VALUE "ProductVersion", "0.9.0.0"
+            VALUE "ProductVersion", "1.0.0.0"
         END
     END
     BLOCK "VarFileInfo"
