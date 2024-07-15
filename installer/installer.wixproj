@@ -1,0 +1,9 @@
+﻿<Project Sdk="WixToolset.Sdk/5.0.0">
+  <PropertyGroup>
+    <OutputName>CapsLockIndicator</OutputName>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CapsLockIndicator.vcxproj" />
+  </ItemGroup>
+</Project>

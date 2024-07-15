@@ -1,0 +1,9 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Package Name="Caps Lock Indicator" Manufacturer="Akhil Harihar" Version="1.0.0.0" UpgradeCode="b24b0870-2d2e-4fa6-bcc4-a0271b5c777b" Scope="perUser">
+		<MediaTemplate EmbedCab="yes" />
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+		<Feature Id="Main">
+			<ComponentGroupRef Id="CapsLockIndicatorComponents" />
+		</Feature>
+	</Package>
+</Wix>

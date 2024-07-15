@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CapsLockIndicator", "CapsLockIndicator.vcxproj", "{07A2A23C-C15E-4C1E-BE02-6351ECDAD656}"
 EndProject
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "installer", "installer\installer.wixproj", "{169794E5-2745-4A53-8D47-D36796271A98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{07A2A23C-C15E-4C1E-BE02-6351ECDAD656}.Debug|x64.Build.0 = Debug|x64
 		{07A2A23C-C15E-4C1E-BE02-6351ECDAD656}.Release|x64.ActiveCfg = Release|x64
 		{07A2A23C-C15E-4C1E-BE02-6351ECDAD656}.Release|x64.Build.0 = Release|x64
+		{169794E5-2745-4A53-8D47-D36796271A98}.Debug|x64.ActiveCfg = Debug|x64
+		{169794E5-2745-4A53-8D47-D36796271A98}.Debug|x64.Build.0 = Debug|x64
+		{169794E5-2745-4A53-8D47-D36796271A98}.Release|x64.ActiveCfg = Release|x64
+		{169794E5-2745-4A53-8D47-D36796271A98}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

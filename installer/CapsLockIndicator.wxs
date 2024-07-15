@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<ComponentGroup Id="CapsLockIndicatorComponents" Directory="INSTALLFOLDER">
+			<Component Guid="A06AD168-9DFD-470E-866C-B0D2C70A3F32">
+				<File Source="CapsLockIndicator.exe" />
+				<RemoveFolder Id="INSTALLFOLDER" On="uninstall"/>
+				<RegistryValue KeyPath="yes" Root="HKCU" Key="Software\CapsLockIndicator\installed" Type="integer" Value="1" />
+				<RemoveRegistryKey Action="removeOnUninstall" Key="Software\CapsLockIndicator\installed" Root="HKCU" />
+			</Component>
+			<Component Guid="3FBA4718-0674-4F81-B159-E7086FC1CA60" Directory="StartupFolder">
+				<Shortcut Name="Caps Lock Indicator" Description="Caps Lock Indicator" Target="[INSTALLFOLDER]CapsLockIndicator.exe"/>
+				<RemoveFile On="uninstall" Name="[StartupFolder]CapsLockIndicator.exe"/>
+				<RegistryValue KeyPath="yes" Root="HKCU" Key="Software\CapsLockIndicator\shortcut" Type="integer" Value="1" />
+				<RemoveRegistryKey Action="removeOnUninstall" Key="Software\CapsLockIndicator\shortcut" Root="HKCU" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
